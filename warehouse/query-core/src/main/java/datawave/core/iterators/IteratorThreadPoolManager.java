@@ -6,9 +6,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import datawave.iterators.filter.ConfigurableAgeOffFilter;
 import org.apache.accumulo.core.client.PluginEnvironment;
 import org.apache.accumulo.core.conf.AccumuloConfiguration;
 import org.apache.accumulo.core.conf.DefaultConfiguration;
@@ -75,6 +78,7 @@ public class IteratorThreadPoolManager {
     }
 
     private ThreadPoolExecutor createExecutorService(int maxThreads, String name) {
+        ThreadFactory tf =  new ThreadFactoryBuilder().setNameFormat(name + "-%d").build();
         ThreadPoolExecutor pool = new ThreadPoolExecutor(maxThreads, maxThreads, 60, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
         pool.allowCoreThreadTimeOut(true);
         return pool;

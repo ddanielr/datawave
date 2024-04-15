@@ -2,8 +2,11 @@ package datawave.query.iterator.profile;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import datawave.iterators.filter.ConfigurableAgeOffFilter;
 import org.apache.accumulo.core.util.threads.ThreadPools;
 import org.apache.accumulo.core.util.threads.Threads;
 import org.junit.Assert;
@@ -84,8 +87,8 @@ public class QuerySpanTest {
         Runnable r1 = new QSRunnable(qsc, qs1);
         Runnable r2 = new QSRunnable(qsc, qs2);
         Runnable r3 = new QSRunnable(qsc, qs3);
-
-        ExecutorService executorService = Executors.newFixedThreadPool(10);
+        ThreadFactory tf = new ThreadFactoryBuilder().setNameFormat("QSExecutor-%d").build();
+        ExecutorService executorService = Executors.newFixedThreadPool(10, tf);
 
         executorService.execute(r1);
         executorService.execute(r2);
