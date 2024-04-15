@@ -5,12 +5,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import datawave.iterators.filter.ConfigurableAgeOffFilter;
 import org.apache.accumulo.core.util.threads.ThreadPools;
 import org.apache.accumulo.core.util.threads.Threads;
 import org.junit.Assert;
 import org.junit.Test;
+
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+
+import datawave.iterators.filter.ConfigurableAgeOffFilter;
 
 public class QuerySpanTest {
 

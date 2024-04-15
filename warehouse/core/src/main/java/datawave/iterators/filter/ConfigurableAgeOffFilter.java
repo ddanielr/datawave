@@ -16,7 +16,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.apache.accumulo.core.client.PluginEnvironment;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
@@ -34,6 +33,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Lists;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import datawave.ingest.util.cache.ReloadableCacheBuilder;
 import datawave.ingest.util.cache.watch.FileRuleWatcher;
@@ -109,8 +109,8 @@ public class ConfigurableAgeOffFilter extends Filter implements OptionDescriber 
 
     private static final Logger log = Logger.getLogger(ConfigurableAgeOffFilter.class);
 
-    private static final ThreadFactory TIMER_THREAD_FACTORY =
-            new ThreadFactoryBuilder().setNameFormat(ConfigurableAgeOffFilter.class.getSimpleName() + "-ruleCache-refresh-%d").build();
+    private static final ThreadFactory TIMER_THREAD_FACTORY = new ThreadFactoryBuilder()
+                    .setNameFormat(ConfigurableAgeOffFilter.class.getSimpleName() + "-ruleCache-refresh-%d").build();
 
     private static final ScheduledExecutorService SIMPLE_TIMER = Executors.newSingleThreadScheduledExecutor(TIMER_THREAD_FACTORY);
 
