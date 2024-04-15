@@ -1,10 +1,9 @@
 package datawave.core.iterators;
 
 import java.util.Map;
-import java.util.Objects;
-import java.util.OptionalInt;
 import java.util.TreeMap;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -14,7 +13,6 @@ import org.apache.accumulo.core.client.PluginEnvironment;
 import org.apache.accumulo.core.conf.AccumuloConfiguration;
 import org.apache.accumulo.core.conf.DefaultConfiguration;
 import org.apache.accumulo.core.iterators.IteratorEnvironment;
-import org.apache.accumulo.core.util.threads.ThreadPools;
 import org.apache.log4j.Logger;
 
 /**
@@ -52,7 +50,7 @@ public class IteratorThreadPoolManager {
         }
         final ThreadPoolExecutor service = createExecutorService(getMaxThreads(prop, pluginEnv), name + " (" + instanceId + ')');
         threadPools.put(name, service);
-        ThreadPools.getServerThreadPools().createGeneralScheduledExecutorService(accumuloConfiguration).scheduleWithFixedDelay(() -> {
+        Executors.newScheduledThreadPool(getMaxThreads(prop, pluginEnv)).scheduleWithFixedDelay(() -> {
             try {
                 // Very important to not use the accumuloConfiguration in this thread and instead use the pluginEnv
                 // The accumuloConfiguration caches table ids which may no longer exist down the road.
@@ -77,8 +75,7 @@ public class IteratorThreadPoolManager {
     }
 
     private ThreadPoolExecutor createExecutorService(int maxThreads, String name) {
-        ThreadPoolExecutor pool = ThreadPools.getServerThreadPools().createThreadPool(maxThreads, maxThreads, 5 * 60, TimeUnit.SECONDS, name,
-                        new LinkedBlockingQueue<>(), false);
+        ThreadPoolExecutor pool = new ThreadPoolExecutor(maxThreads, maxThreads, 60, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
         pool.allowCoreThreadTimeOut(true);
         return pool;
     }
