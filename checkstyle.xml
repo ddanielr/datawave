@@ -3,12 +3,9 @@
 <module name="Checker">
   <property name="charset" value="UTF-8"/>
   <module name="TreeWalker">
-    <!--check that only Accumulo 1.9 public APIs are imported-->
-    <module name="RegexpSinglelineJava">
-<!--      <property name="format" value="import\s+org\.apache\.accumulo\.(.*\.(impl|thrift|crypto)\..*|(?!core|minicluster|testing).*|core\.(?!client|conf|data|security|spi|iterators).*)"/>-->
-      <property name="format" value="import\s+org\.apache\.accumulo\.(?!(core\.(client|data|iterators|security)|minicluster|hadoop)\.).*" />
-      <property name="ignoreComments" value="true" />
-      <property name="message" value="Accumulo non-public classes imported" />
+    <!--check that only Accumulo 2.1.x public APIs are imported-->
+    <module name="ImportControl">
+        <property name="file" value="import-control-accumulo.xml"/>
     </module>
   </module>
 </module>
