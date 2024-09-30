@@ -165,25 +165,7 @@ public class RecordIterator extends RangeSplit implements SortedKeyValueIterator
 
     public static class RFileEnvironment implements IteratorEnvironment {
 
-        AccumuloConfiguration conf;
-
-        public RFileEnvironment(AccumuloConfiguration conf) {
-            this.conf = conf;
-        }
-
-        public RFileEnvironment() {
-            this.conf = DefaultConfiguration.getInstance();
-        }
-
-        @Override
-        public SortedKeyValueIterator<Key,Value> reserveMapFileReader(String s) throws IOException {
-            return null;
-        }
-
-        @Override
-        public AccumuloConfiguration getConfig() {
-            return conf;
-        }
+        public RFileEnvironment() {}
 
         @Override
         public IteratorScope getIteratorScope() {
@@ -193,11 +175,6 @@ public class RecordIterator extends RangeSplit implements SortedKeyValueIterator
         @Override
         public boolean isFullMajorCompaction() {
             throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public void registerSideChannel(SortedKeyValueIterator<Key,Value> sortedKeyValueIterator) {
-
         }
 
         @Override
@@ -226,11 +203,6 @@ public class RecordIterator extends RangeSplit implements SortedKeyValueIterator
         }
 
         @Override
-        public ServiceEnvironment getServiceEnv() {
-            return null;
-        }
-
-        @Override
         public PluginEnvironment getPluginEnv() {
             return null;
         }
@@ -238,6 +210,11 @@ public class RecordIterator extends RangeSplit implements SortedKeyValueIterator
         @Override
         public TableId getTableId() {
             return null;
+        }
+
+        @Override
+        public boolean isRunningLowOnMemory() {
+            return false;
         }
     }
 

@@ -269,8 +269,9 @@ public class DataTypeAgeOffFilter extends AppliedRule {
 
         isIndextable = false;
         if (options.getOption(AgeOffConfigParams.IS_INDEX_TABLE) == null) {
-            if (iterEnv != null && iterEnv.getConfig() != null) {
-                isIndextable = Boolean.parseBoolean(iterEnv.getConfig().get("table.custom." + AgeOffConfigParams.IS_INDEX_TABLE));
+            if (iterEnv != null) {
+                var config = iterEnv.getPluginEnv().getConfiguration(iterEnv.getTableId());
+                isIndextable = Boolean.parseBoolean(config.getTableCustom(AgeOffConfigParams.IS_INDEX_TABLE));
             }
         } else { // legacy
             isIndextable = Boolean.valueOf(options.getOption(AgeOffConfigParams.IS_INDEX_TABLE));
@@ -298,7 +299,8 @@ public class DataTypeAgeOffFilter extends AppliedRule {
                 final String dataTypeHasScanTime = options.getOption(dataType + ".hasScanTime");
                 if (Boolean.parseBoolean(dataTypeHasScanTime)) {
                     if (iterEnv != null) {
-                        final String scanTime = iterEnv.getConfig().get("table.custom.timestamp.current." + dataType);
+                        var config = iterEnv.getPluginEnv().getConfiguration(iterEnv.getTableId());
+                        final String scanTime = config.getTableCustom("timestamp.current." + dataType);
                         try {
                             dataTypeScanTimes.put(dataType, Long.parseLong(scanTime, 10));
                         } catch (final NumberFormatException e) {

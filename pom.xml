@@ -98,7 +98,7 @@
         <version.hamcrest>1.3</version.hamcrest>
         <version.httpcomponents-httpclient>4.5.13</version.httpcomponents-httpclient>
         <version.httpcomponents-httpcore>4.4.8</version.httpcomponents-httpcore>
-        <version.in-memory-accumulo>4.0.1</version.in-memory-accumulo>
+        <version.in-memory-accumulo>5.0.0-SNAPSHOT</version.in-memory-accumulo>
         <version.infinispan>9.4.21.Final</version.infinispan>
         <version.jackson>2.10.0.pr1</version.jackson>
         <version.jackson-mapper-asl>1.9.13</version.jackson-mapper-asl>
@@ -147,11 +147,17 @@
         <version.woodstox-core>5.4.0</version.woodstox-core>
         <version.woodstox-stax2>3.1.4</version.woodstox-stax2>
         <version.xerces>2.12.2</version.xerces>
-        <version.zookeeper>3.8.4</version.zookeeper>
+        <!-- ACCUMULO4_TODO test were failing until the zookeeper version was set to the same as accumulo, needs investigation -->
+        <version.zookeeper>3.9.2</version.zookeeper>
         <!-- Unless a version is duplicated multiple times, just place the version on the dependency in dependencyManagement. -->
     </properties>
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>ch.qos.reload4j</groupId>
+                <artifactId>reload4j</artifactId>
+                <version>${version.reload4j}</version>
+            </dependency>
             <dependency>
                 <groupId>org.apache.logging.log4j</groupId>
                 <artifactId>log4j-bom</artifactId>

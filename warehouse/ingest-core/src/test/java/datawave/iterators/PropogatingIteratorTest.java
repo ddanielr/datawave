@@ -87,12 +87,6 @@ public class PropogatingIteratorTest {
         private final boolean major;
         private final boolean isUser;
 
-        public MockIteratorEnvironment(AccumuloConfiguration conf) {
-            this.conf = conf;
-            this.isUser = false;
-            this.major = false;
-        }
-
         public MockIteratorEnvironment(boolean major) {
             this(major, false);
         }
@@ -101,11 +95,6 @@ public class PropogatingIteratorTest {
             this.conf = DefaultConfiguration.getInstance();
             this.major = major;
             this.isUser = isUser;
-        }
-
-        @Override
-        public AccumuloConfiguration getConfig() {
-            return conf;
         }
 
         @Override
@@ -127,11 +116,6 @@ public class PropogatingIteratorTest {
         }
 
         @Override
-        public ServiceEnvironment getServiceEnv() {
-            return null;
-        }
-
-        @Override
         public PluginEnvironment getPluginEnv() {
             return null;
         }
@@ -139,11 +123,6 @@ public class PropogatingIteratorTest {
         @Override
         public TableId getTableId() {
             return null;
-        }
-
-        @Override
-        public void registerSideChannel(SortedKeyValueIterator<Key,Value> iter) {
-            throw new UnsupportedOperationException();
         }
 
         @Override
@@ -163,11 +142,6 @@ public class PropogatingIteratorTest {
 
         @Override
         public SamplerConfiguration getSamplerConfiguration() {
-            return null;
-        }
-
-        @Override
-        public SortedKeyValueIterator<Key,Value> reserveMapFileReader(String arg0) {
             return null;
         }
     }
