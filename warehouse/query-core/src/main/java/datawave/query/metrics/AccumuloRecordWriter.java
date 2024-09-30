@@ -30,8 +30,8 @@ import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
+import datawave.accumulo.inmemory.InMemoryAccumulo;
 import datawave.accumulo.inmemory.InMemoryAccumuloClient;
-import datawave.accumulo.inmemory.InMemoryInstance;
 import datawave.common.util.ArgumentChecker;
 import datawave.core.common.connection.AccumuloConnectionFactory;
 import datawave.core.common.connection.AccumuloConnectionFactory.Priority;
@@ -227,7 +227,7 @@ public class AccumuloRecordWriter extends RecordWriter<Text,Mutation> {
             if (e.getSecurityErrorCodes().size() >= 0) {
                 HashSet<String> tables = new HashSet<>();
                 for (TabletId tabletId : e.getSecurityErrorCodes().keySet()) {
-                    tables.add(tabletId.getTableId().toString());
+                    tables.add(tabletId.getTable().toString());
                 }
 
                 log.error("Not authorized to write to tables : " + tables);
@@ -329,7 +329,7 @@ public class AccumuloRecordWriter extends RecordWriter<Text,Mutation> {
 
     protected static AccumuloClient getClient(Configuration conf) throws AccumuloSecurityException, AccumuloException {
         if (conf.getBoolean(MOCK, false)) {
-            InMemoryAccumuloClient client = new InMemoryAccumuloClient(getUsername(conf), new InMemoryInstance(conf.get(INSTANCE_NAME)));
+            InMemoryAccumuloClient client = new InMemoryAccumuloClient(getUsername(conf), new InMemoryAccumulo(conf.get(INSTANCE_NAME)));
             client.securityOperations().changeLocalUserPassword(client.whoami(), new PasswordToken(getPassword(conf)));
             return client;
         } else {

@@ -33,7 +33,6 @@ import org.apache.accumulo.core.iterators.IteratorUtil.IteratorScope;
 import org.apache.accumulo.core.iterators.SortedKeyValueIterator;
 import org.apache.accumulo.core.iteratorsImpl.system.SortedMapIterator;
 import org.apache.accumulo.core.security.Authorizations;
-import org.apache.accumulo.core.spi.common.ServiceEnvironment;
 import org.apache.accumulo.core.spi.crypto.CryptoEnvironment;
 import org.apache.accumulo.core.spi.crypto.CryptoService;
 import org.apache.accumulo.core.util.ConfigurationImpl;
@@ -352,39 +351,15 @@ public class SourceManagerTest {
 
     public static class MockIteratorEnvironment implements IteratorEnvironment {
 
-        AccumuloConfiguration conf;
-
-        public MockIteratorEnvironment(AccumuloConfiguration conf) {
-            this.conf = conf;
-        }
+        PluginEnvironment.Configuration conf;
 
         public MockIteratorEnvironment() {
-            this.conf = DefaultConfiguration.getInstance();
-        }
-
-        @Override
-        public SortedKeyValueIterator<Key,Value> reserveMapFileReader(String mapFileName) throws IOException {
-            Configuration conf = new Configuration();
-            FileSystem fs = FileSystem.get(conf);
-            CryptoService cs = CryptoFactoryLoader.getServiceForClient(CryptoEnvironment.Scope.TABLE,
-                            DefaultConfiguration.getInstance().getAllCryptoProperties());
-            return RFileOperations.getInstance().newReaderBuilder().forFile(mapFileName, fs, conf, cs)
-                            .withTableConfiguration(DefaultConfiguration.getInstance()).seekToBeginning().build();
+            this.conf = PluginEnvironment.Configuration.from(Map.of(), true);
         }
 
         @Override
         public PluginEnvironment getPluginEnv() {
             return new MockPluginEnvironment();
-        }
-
-        @Override
-        public TableId getTableId() {
-            return null;
-        }
-
-        @Override
-        public AccumuloConfiguration getConfig() {
-            return conf;
         }
 
         @Override
@@ -400,11 +375,6 @@ public class SourceManagerTest {
         @Override
         public boolean isUserCompaction() {
             return false;
-        }
-
-        @Override
-        public ServiceEnvironment getServiceEnv() {
-            return null;
         }
 
         @Override
@@ -427,20 +397,22 @@ public class SourceManagerTest {
             return null;
         }
 
+        private static final TableId FAKE_ID = TableId.of("fake");
+
         @Override
-        public void registerSideChannel(SortedKeyValueIterator<Key,Value> iter) {
-            throw new UnsupportedOperationException();
+        public TableId getTableId() {
+            return FAKE_ID;
         }
 
         public class MockPluginEnvironment implements PluginEnvironment {
             @Override
             public Configuration getConfiguration() {
-                return new ConfigurationImpl(conf);
+                return conf;
             }
 
             @Override
             public Configuration getConfiguration(TableId tableId) {
-                return new ConfigurationImpl(conf);
+                return conf;
             }
 
             @Override
@@ -449,12 +421,12 @@ public class SourceManagerTest {
             }
 
             @Override
-            public <T> T instantiate(String className, Class<T> base) throws Exception {
+            public <T> T instantiate(String className, Class<T> base) {
                 return null;
             }
 
             @Override
-            public <T> T instantiate(TableId tableId, String className, Class<T> base) throws Exception {
+            public <T> T instantiate(TableId tableId, String className, Class<T> base) {
                 return null;
             }
         }

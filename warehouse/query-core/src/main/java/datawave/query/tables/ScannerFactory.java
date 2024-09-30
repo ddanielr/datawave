@@ -136,7 +136,7 @@ public class ScannerFactory {
         }
 
         if (log.isDebugEnabled()) {
-            log.debug("Created ScannerFactory {}, wrapped={}", System.identityHashCode(this), (client instanceof WrappedAccumuloClient));
+            log.debug("Created ScannerFactory {}", System.identityHashCode(this));
         }
     }
 

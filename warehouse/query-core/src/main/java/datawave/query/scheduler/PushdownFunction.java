@@ -1,12 +1,18 @@
 package datawave.query.scheduler;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
+import com.google.common.collect.Sets;
+import org.apache.accumulo.core.client.AccumuloClient;
+import org.apache.accumulo.core.client.AccumuloException;
+import org.apache.accumulo.core.client.AccumuloSecurityException;
+import org.apache.accumulo.core.client.InvalidTabletHostingRequestException;
 import org.apache.accumulo.core.client.IteratorSetting;
-import org.apache.accumulo.core.clientImpl.TabletLocator;
+import org.apache.accumulo.core.client.TableDeletedException;
+import org.apache.accumulo.core.client.TableNotFoundException;
+import org.apache.accumulo.core.client.TableOfflineException;
+import org.apache.accumulo.core.clientImpl.ClientContext;
+import org.apache.accumulo.core.clientImpl.ClientTabletCache;
 import org.apache.accumulo.core.data.Range;
 import org.apache.accumulo.core.data.TableId;
 import org.apache.hadoop.io.Text;
@@ -36,27 +42,24 @@ public class PushdownFunction implements Function<QueryData,List<ScannerChunk>> 
      * The shard query config
      */
     private final ShardQueryConfiguration config;
+
+    /**
+     * Tablet locator
+     */
+    private final ClientTabletCache tabletLocator;
+
+    /**
+     * Set of query plans
+     */
+    protected Set<Integer> queryPlanSet;
     // any custom settings
     protected Collection<IteratorSetting> customSettings;
     // table id, used to apply execution hints
     protected TableId tableId;
 
     @Deprecated
-    public PushdownFunction(TabletLocator tabletLocator, ShardQueryConfiguration config, Collection<IteratorSetting> settings, TableId tableId) {
-        this(config, settings, tableId);
-    }
-
-    /**
-     * Preferred constructor
-     *
-     * @param config
-     *            the config
-     * @param settings
-     *            the iterator settings
-     * @param tableId
-     *            the table id
-     */
-    public PushdownFunction(ShardQueryConfiguration config, Collection<IteratorSetting> settings, TableId tableId) {
+    public PushdownFunction(ClientTabletCache tabletLocator, ShardQueryConfiguration config, Collection<IteratorSetting> settings, TableId tableId) {
+        this.tabletLocator = tabletLocator;
         this.config = config;
         this.customSettings = settings;
         this.tableId = tableId;

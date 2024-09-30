@@ -275,6 +275,7 @@ public class IngestMetricsSummaryLoader extends Configured implements Tool {
         job.setMapperClass(IngestMetricsMapper.class);
         job.setMapOutputKeyClass(Key.class);
         job.setMapOutputValueClass(Value.class);
+
         job.setInputFormatClass(AccumuloInputFormat.class);
 
         // @formatter:off

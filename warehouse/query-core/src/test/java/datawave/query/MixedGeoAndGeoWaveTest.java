@@ -57,8 +57,8 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Multimap;
 
+import datawave.accumulo.inmemory.InMemoryAccumulo;
 import datawave.accumulo.inmemory.InMemoryAccumuloClient;
-import datawave.accumulo.inmemory.InMemoryInstance;
 import datawave.configuration.spring.SpringBean;
 import datawave.data.type.GeoType;
 import datawave.data.type.PointType;
@@ -176,7 +176,7 @@ public class MixedGeoAndGeoWaveTest {
     @SpringBean(name = "EventQuery")
     ShardQueryLogic logic;
 
-    private static InMemoryInstance instance;
+    private static InMemoryAccumulo instance;
 
     private static List<IvaratorCacheDirConfig> ivaratorCacheDirConfigs;
 
@@ -196,7 +196,7 @@ public class MixedGeoAndGeoWaveTest {
     public static void setupClass() throws Exception {
         System.setProperty("subject.dn.pattern", "(?:^|,)\\s*OU\\s*=\\s*My Department\\s*(?:,|$)");
 
-        instance = new InMemoryInstance();
+        instance = new InMemoryAccumulo();
 
         int recNum = 1;
 

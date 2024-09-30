@@ -491,16 +491,6 @@ public abstract class AggregatingReducer<IK,IV,OK,OV> extends Reducer<IK,IV,OK,O
             StubbedIteratorEnvironment() {}
 
             @Override
-            public AccumuloConfiguration getConfig() {
-                return null;
-            }
-
-            @Override
-            public SortedKeyValueIterator<Key,Value> reserveMapFileReader(String mapFileName) throws IOException {
-                return null;
-            }
-
-            @Override
             public IteratorUtil.IteratorScope getIteratorScope() {
                 return null;
             }
@@ -548,11 +538,6 @@ public abstract class AggregatingReducer<IK,IV,OK,OV> extends Reducer<IK,IV,OK,O
             @Override
             public SamplerConfiguration getSamplerConfiguration() {
                 return null;
-            }
-
-            @Override
-            public void registerSideChannel(SortedKeyValueIterator<Key,Value> iter) {
-
             }
         }
     }
