@@ -35,7 +35,7 @@ import org.apache.accumulo.core.client.security.tokens.PasswordToken;
 import org.apache.accumulo.core.clientImpl.ClientContext;
 import org.apache.accumulo.core.manager.thrift.ManagerClientService;
 import org.apache.accumulo.core.manager.thrift.ManagerMonitorInfo;
-import org.apache.accumulo.core.master.thrift.TableInfo;
+import org.apache.accumulo.core.manager.thrift.TableInfo;
 import org.apache.accumulo.core.rpc.ThriftUtil;
 import org.apache.accumulo.core.rpc.clients.ThriftClientTypes;
 import org.apache.hadoop.conf.Configurable;
