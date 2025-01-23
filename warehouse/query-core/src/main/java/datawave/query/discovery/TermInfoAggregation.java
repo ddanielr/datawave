@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.accumulo.access.AccessExpression;
 import org.apache.accumulo.core.security.ColumnVisibility;
 import org.apache.hadoop.io.MapWritable;
 import org.apache.hadoop.io.Text;
@@ -15,6 +16,7 @@ import org.apache.log4j.Logger;
 import com.google.common.base.Function;
 import com.google.common.collect.Sets;
 
+import datawave.marking.FlattenedVisibilityCache;
 import datawave.marking.MarkingFunctions;
 
 public class TermInfoAggregation implements Function<Collection<TermInfo>,DiscoveredThing> {
@@ -79,7 +81,7 @@ public class TermInfoAggregation implements Function<Collection<TermInfo>,Discov
                     // Keep track of counts for individual vis
                     if (separateCountsByColumnVisibility) {
                         Long cnt = 0L;
-                        String vis = new String(ti.vis.flatten());
+                        String vis = FlattenedVisibilityCache.normalize(AccessExpression.parse(ti.vis.getExpression())).expression;
                         if (counts.containsKey(vis)) {
                             cnt = counts.get(vis);
                             cnt += chosenCount;
@@ -119,7 +121,7 @@ public class TermInfoAggregation implements Function<Collection<TermInfo>,Discov
                     countsByVis.put(new Text(entry.getKey()), new VLongWritable(entry.getValue()));
                 }
 
-                return new DiscoveredThing(term, field, type, date, new String(columnVisibility.flatten()), count, countsByVis);
+                return new DiscoveredThing(term, field, type, date, new String(columnVisibility.getExpression()), count, countsByVis);
             }
         }
     }
