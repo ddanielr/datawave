@@ -16,6 +16,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
 
+import org.apache.accumulo.access.AccessExpression;
 import org.apache.accumulo.core.client.AccumuloClient;
 import org.apache.accumulo.core.client.AccumuloException;
 import org.apache.accumulo.core.client.AccumuloSecurityException;
@@ -50,6 +51,7 @@ import datawave.data.ColumnFamilyConstants;
 import datawave.data.type.Type;
 import datawave.ingest.protobuf.Uid;
 import datawave.ingest.protobuf.Uid.List.Builder;
+import datawave.marking.FlattenedVisibilityCache;
 import datawave.marking.MarkingFunctions;
 import datawave.microservice.query.DefaultQueryParameters;
 import datawave.microservice.query.QueryPersistence;
@@ -842,10 +844,10 @@ public class MutableMetadataHandler extends ModificationServiceConfiguration {
                     continue;
                 }
 
-                if (null != oldColumnVisibility) {
-                    // need to compare the flattened values for equivalence. It's possible for the visibility to be in a different order
-                    String oldColViz = new String(oldColumnVisibility.flatten(), "UTF-8");
-                    String thisVis = new String(thisViz.flatten(), "UTF-8");
+                if (oldColumnVisibility != null) {
+                    // need to compare the flattened values for equivalence.
+                    String oldColViz = FlattenedVisibilityCache.normalize(AccessExpression.parse(oldColumnVisibility.getExpression())).expression;
+                    String thisVis = FlattenedVisibilityCache.normalize(AccessExpression.parse(thisViz.getExpression())).expression;
                     if (!oldColViz.equals(thisVis)) {
                         log.trace("Skipping key that does not match with column visibility: {}", e.getKey());
                         continue;

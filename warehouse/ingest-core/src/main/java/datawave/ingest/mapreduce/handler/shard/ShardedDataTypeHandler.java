@@ -1,5 +1,7 @@
 package datawave.ingest.mapreduce.handler.shard;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -7,6 +9,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.accumulo.access.AccessExpression;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.security.ColumnVisibility;
@@ -45,6 +48,7 @@ import datawave.ingest.table.config.LoadDateTableConfigHelper;
 import datawave.ingest.util.BloomFilterUtil;
 import datawave.ingest.util.BloomFilterWrapper;
 import datawave.ingest.util.DiskSpaceStarvationStrategy;
+import datawave.marking.FlattenedVisibilityCache;
 import datawave.marking.MarkingFunctions;
 import datawave.query.model.Direction;
 import datawave.util.CompositeTimestamp;
@@ -796,7 +800,7 @@ public abstract class ShardedDataTypeHandler<KEYIN> extends StatsDEnabledDataTyp
                 throw new RuntimeException("Cannot convert record-level markings into a column visibility", e);
             }
         }
-        return flatten(visibility);
+        return visibility.getExpression();
     }
 
     /**
@@ -807,7 +811,8 @@ public abstract class ShardedDataTypeHandler<KEYIN> extends StatsDEnabledDataTyp
      * @return the flattened visibility
      */
     protected byte[] flatten(ColumnVisibility vis) {
-        return markingFunctions == null ? vis.flatten() : markingFunctions.flatten(vis);
+        return markingFunctions == null ? FlattenedVisibilityCache.normalize(AccessExpression.parse(vis.getExpression())).expression.getBytes(UTF_8)
+                        : markingFunctions.flatten(vis);
     }
 
     /**

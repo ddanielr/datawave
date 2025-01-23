@@ -12,14 +12,16 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
+import org.apache.accumulo.access.AccessEvaluator;
+import org.apache.accumulo.access.AccessExpression;
+import org.apache.accumulo.access.InvalidAccessExpressionException;
 import org.apache.accumulo.core.client.AccumuloClient;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.security.Authorizations;
 import org.apache.accumulo.core.security.ColumnVisibility;
-import org.apache.accumulo.core.security.VisibilityEvaluator;
-import org.apache.accumulo.core.security.VisibilityParseException;
 import org.apache.commons.collections4.Transformer;
 import org.apache.commons.collections4.iterators.TransformIterator;
 import org.junit.Assert;
@@ -87,7 +89,6 @@ public class CompositeQueryLogicTest {
     private Value value6 = new Value(key6.getRowData().getBackingArray());
     private Value value7 = new Value(key7.getRowData().getBackingArray());
     private Value value8 = new Value(key8.getRowData().getBackingArray());
-    private Value valueFailure = new Value(keyFailure.getRowData().getBackingArray());
     private Value valueSpecial = new Value(keySpecial.getRowData().getBackingArray());
 
     private static final String VALIDATION_MESSAGE = "Light is green, the trap is clean";
@@ -300,13 +301,13 @@ public class CompositeQueryLogicTest {
         }
 
         private boolean checkAuths(ColumnVisibility vis) {
-            return auths.stream().allMatch(a -> {
-                try {
-                    return new VisibilityEvaluator(a).evaluate(vis);
-                } catch (VisibilityParseException e) {
-                    throw new RuntimeException(e);
-                }
-            });
+            try {
+                AccessExpression.of(vis.getExpression());
+                return AccessEvaluator.of(auths.stream().map(Authorizations::toAccessAuthorizations).collect(Collectors.toSet()))
+                                .canAccess(AccessExpression.of(vis.getExpression()));
+            } catch (InvalidAccessExpressionException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         @Override
