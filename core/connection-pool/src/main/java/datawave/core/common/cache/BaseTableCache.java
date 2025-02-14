@@ -26,7 +26,6 @@ import org.apache.accumulo.core.data.Range;
 import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.iterators.user.RegExFilter;
 import org.apache.accumulo.core.security.Authorizations;
-import org.apache.accumulo.core.security.ColumnVisibility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -210,8 +209,10 @@ public class BaseTableCache implements Serializable, TableCache {
                 Key valueKey = value.getKey();
 
                 Mutation m = new Mutation(value.getKey().getRow());
-                m.put(valueKey.getColumnFamily(), valueKey.getColumnQualifier(), new ColumnVisibility(valueKey.getColumnVisibility()), valueKey.getTimestamp(),
-                                value.getValue());
+                m.at().family(valueKey.getColumnFamilyData().getBackingArray())
+                        .qualifier(valueKey.getColumnQualifierData().getBackingArray())
+                        .visibility(valueKey.getColumnVisibilityData().getBackingArray())
+                        .timestamp(valueKey.getTimestamp()).put(value.getValue());
                 writer.addMutation(m);
                 count++;
             }
