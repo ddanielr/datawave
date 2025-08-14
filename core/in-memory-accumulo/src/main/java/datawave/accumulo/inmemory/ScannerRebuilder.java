@@ -13,6 +13,7 @@ public interface ScannerRebuilder {
      * Providing a null lastKey will result in rebuilding the iterator without updating any of the ranges.
      *
      * @param lastKey
+     *            lastKey from scanner
      * @return The rebuilt iterator stack.
      */
     public Iterator<Map.Entry<Key,Value>> rebuild(Key lastKey);

@@ -46,6 +46,13 @@ public class InMemoryBatchDeleter extends InMemoryBatchScanner implements BatchD
 
     /**
      * Create a {@link BatchDeleter} for the specified instance on the specified table where the writer uses the specified {@link Authorizations}.
+     *
+     * @param acc
+     *            accumulo InMemoryAccumulo instance
+     * @param tableName
+     *            target table name
+     * @param auths
+     *            Authorizations to use
      */
     public InMemoryBatchDeleter(InMemoryAccumulo acc, String tableName, Authorizations auths) {
         super(acc.tables.get(tableName), auths);
@@ -56,8 +63,7 @@ public class InMemoryBatchDeleter extends InMemoryBatchScanner implements BatchD
     @Override
     public void delete() throws MutationsRejectedException, TableNotFoundException {
 
-        BatchWriter writer = new InMemoryBatchWriter(acc, tableName);
-        try {
+        try (BatchWriter writer = new InMemoryBatchWriter(acc, tableName)) {
             Iterator<Entry<Key,Value>> iter = super.iterator();
             while (iter.hasNext()) {
                 Entry<Key,Value> next = iter.next();
@@ -66,8 +72,6 @@ public class InMemoryBatchDeleter extends InMemoryBatchScanner implements BatchD
                 m.putDelete(k.getColumnFamily(), k.getColumnQualifier(), new ColumnVisibility(k.getColumnVisibility()), k.getTimestamp());
                 writer.addMutation(m);
             }
-        } finally {
-            writer.close();
         }
     }
 

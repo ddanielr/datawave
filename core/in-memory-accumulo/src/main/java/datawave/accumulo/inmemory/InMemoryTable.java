@@ -43,7 +43,7 @@ import org.apache.hadoop.io.Text;
 public class InMemoryTable {
 
     static class InMemoryMemKey extends Key {
-        private int count;
+        private final int count;
 
         InMemoryMemKey(Key key, int count) {
             super(key);
@@ -85,12 +85,12 @@ public class InMemoryTable {
     int mutationCount = 0;
     final Map<String,String> settings;
     Map<String,EnumSet<TablePermission>> userPermissions = new HashMap<>();
-    private TimeType timeType;
+    private final TimeType timeType;
     SortedSet<Text> splits = new ConcurrentSkipListSet<>();
     Map<String,Set<Text>> localityGroups = new TreeMap<>();
     private InMemoryNamespace namespace;
     private String namespaceName;
-    private String tableId;
+    private final String tableId;
 
     InMemoryTable(boolean limitVersion, TimeType timeType, String tableId) {
         this.timeType = timeType;
@@ -114,9 +114,7 @@ public class InMemoryTable {
                 settings.put(key, entry.getValue());
         }
 
-        for (Entry<String,String> initialProp : properties.entrySet()) {
-            settings.put(initialProp.getKey(), initialProp.getValue());
-        }
+        settings.putAll(properties);
     }
 
     public InMemoryTable(InMemoryNamespace namespace, TimeType timeType, String tableId, Map<String,String> properties) {
@@ -130,9 +128,7 @@ public class InMemoryTable {
         }
 
         Set<Entry<String,String>> set = namespace.settings.entrySet();
-        Iterator<Entry<String,String>> entries = set.iterator();
-        while (entries.hasNext()) {
-            Entry<String,String> entry = entries.next();
+        for (Entry<String,String> entry : set) {
             String key = entry.getKey();
             if (key.startsWith(Property.TABLE_PREFIX.getKey()))
                 settings.put(key, entry.getValue());
@@ -176,9 +172,7 @@ public class InMemoryTable {
     }
 
     public void merge(Text start, Text end) {
-        boolean reAdd = false;
-        if (splits.contains(start))
-            reAdd = true;
+        boolean reAdd = splits.contains(start);
         splits.removeAll(splits.subSet(start, end));
         if (reAdd)
             splits.add(start);

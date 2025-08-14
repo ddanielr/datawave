@@ -2,6 +2,7 @@ package datawave.accumulo.inmemory;
 
 import org.apache.accumulo.core.client.PluginEnvironment;
 import org.apache.accumulo.core.conf.AccumuloConfiguration;
+import org.apache.accumulo.core.data.TableId;
 import org.apache.accumulo.core.util.ConfigurationImpl;
 import org.mockito.Mockito;
 
@@ -16,13 +17,14 @@ public final class MockPluginEnvironment {
     /**
      * Creates a new mock PluginEnvironment.
      *
-     * @param conf
-     *            The accumulo configuration
+     * @param inMemoryTable
+     *            The accumulo table to use for configuration
      * @return A plugin environment
      */
-    public static PluginEnvironment newInstance(AccumuloConfiguration conf) {
+    public static PluginEnvironment newInstance(InMemoryTable inMemoryTable) {
         PluginEnvironment pluginEnv = Mockito.mock(PluginEnvironment.class);
-        Mockito.when(pluginEnv.getConfiguration()).thenReturn(new ConfigurationImpl(conf));
+        Mockito.when(pluginEnv.getConfiguration(TableId.of(inMemoryTable.getTableId())))
+                        .thenReturn(PluginEnvironment.Configuration.from(inMemoryTable.settings, true));
         return pluginEnv;
     }
 }

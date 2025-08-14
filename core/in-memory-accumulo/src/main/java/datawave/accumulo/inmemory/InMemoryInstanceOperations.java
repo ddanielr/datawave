@@ -16,21 +16,19 @@
  */
 package datawave.accumulo.inmemory;
 
-import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.time.Duration;
+import java.util.*;
+import java.util.function.BiPredicate;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import org.apache.accumulo.core.classloader.ClassLoaderUtil;
-import org.apache.accumulo.core.client.AccumuloException;
-import org.apache.accumulo.core.client.AccumuloSecurityException;
 import org.apache.accumulo.core.client.admin.ActiveCompaction;
 import org.apache.accumulo.core.client.admin.ActiveScan;
 import org.apache.accumulo.core.client.admin.InstanceOperations;
+import org.apache.accumulo.core.client.admin.servers.ServerId;
 import org.apache.accumulo.core.data.InstanceId;
+import org.apache.accumulo.core.data.ResourceGroupId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,29 +46,28 @@ class InMemoryInstanceOperations implements InstanceOperations {
     }
 
     @Override
-    public void setProperty(String property, String value) throws AccumuloException, AccumuloSecurityException {
+    public void setProperty(String property, String value) {
         acu.setProperty(property, value);
     }
 
     @Override
-    public Map<String,String> modifyProperties(Consumer<Map<String,String>> mapMutator)
-                    throws AccumuloException, AccumuloSecurityException, IllegalArgumentException, ConcurrentModificationException {
+    public Map<String,String> modifyProperties(Consumer<Map<String,String>> mapMutator) throws IllegalArgumentException, ConcurrentModificationException {
         mapMutator.accept(acu.systemProperties);
         return acu.systemProperties;
     }
 
     @Override
-    public void removeProperty(String property) throws AccumuloException, AccumuloSecurityException {
+    public void removeProperty(String property) {
         acu.removeProperty(property);
     }
 
     @Override
-    public Map<String,String> getSystemConfiguration() throws AccumuloException, AccumuloSecurityException {
+    public Map<String,String> getSystemConfiguration() {
         return acu.systemProperties;
     }
 
     @Override
-    public Map<String,String> getSiteConfiguration() throws AccumuloException, AccumuloSecurityException {
+    public Map<String,String> getSiteConfiguration() {
         return acu.systemProperties;
     }
 
@@ -81,6 +78,21 @@ class InMemoryInstanceOperations implements InstanceOperations {
 
     @Override
     public Set<String> getCompactors() {
+        return new HashSet<>();
+    }
+
+    @Override
+    public ServerId getServer(ServerId.Type type, ResourceGroupId rgid, String s1, int i) {
+        return null;
+    }
+
+    @Override
+    public Set<ServerId> getServers(ServerId.Type type) {
+        return Set.of();
+    }
+
+    @Override
+    public Set<ServerId> getServers(ServerId.Type type, Predicate<ResourceGroupId> predicate, BiPredicate<String,Integer> biPredicate) {
         return Set.of();
     }
 
@@ -90,12 +102,20 @@ class InMemoryInstanceOperations implements InstanceOperations {
     }
 
     @Override
-    public List<ActiveScan> getActiveScans(String tserver) throws AccumuloException, AccumuloSecurityException {
+    public List<ActiveScan> getActiveScans(String server) {
         return new ArrayList<>();
     }
 
     @Override
-    public boolean testClassLoad(String className, String asTypeName) throws AccumuloException, AccumuloSecurityException {
+    public List<ActiveScan> getActiveScans(Collection<ServerId> tservers) {
+        return new ArrayList<>();
+    }
+
+    @Override
+    public void ping(ServerId serverId) {}
+
+    @Override
+    public boolean testClassLoad(String className, String asTypeName) {
         try {
             ClassLoaderUtil.loadClass(className, Class.forName(asTypeName));
         } catch (ClassNotFoundException e) {
@@ -106,30 +126,40 @@ class InMemoryInstanceOperations implements InstanceOperations {
     }
 
     @Override
-    public List<ActiveCompaction> getActiveCompactions(String tserver) throws AccumuloException, AccumuloSecurityException {
+    public List<ActiveCompaction> getActiveCompactions() {
+        return getActiveCompactions("");
+    }
+
+    @Override
+    public List<ActiveCompaction> getActiveCompactions(String tserver) {
+        return getActiveCompactions(List.of(new ServerId(ServerId.Type.COMPACTOR, ResourceGroupId.of("default"), "null", 1234)));
+    }
+
+    @Override
+    public List<ActiveCompaction> getActiveCompactions(Collection<ServerId> servers) {
         return new ArrayList<>();
     }
 
     @Override
-    public List<ActiveCompaction> getActiveCompactions() throws AccumuloException, AccumuloSecurityException {
-        return new ArrayList<>();
-    }
-
-    @Override
-    public void ping(String tserver) throws AccumuloException {
+    public void ping(String tserver) {
 
     }
 
     @Override
-    public void waitForBalance() throws AccumuloException {}
-
-    @Override
-    public String getInstanceID() {
-        return "in-memory-instance";
-    }
+    public void waitForBalance() {}
 
     @Override
     public InstanceId getInstanceId() {
         return InstanceId.of("in-memory-instance");
+    }
+
+    @Override
+    public Duration getManagerTime() {
+        return null;
+    }
+
+    @Override
+    public Map<String,String> getSystemProperties() {
+        return Map.of();
     }
 }
