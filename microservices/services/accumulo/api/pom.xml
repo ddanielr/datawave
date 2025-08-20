@@ -18,9 +18,9 @@
     </scm>
     <properties>
         <datawave.webservice.namespace>http://webservice.datawave.nsa/v1</datawave.webservice.namespace>
-        <version.accumulo>2.1.4-5792fed3-bulkv2</version.accumulo>
-        <version.datawave.accumulo-utils>4.0.1</version.datawave.accumulo-utils>
-        <version.datawave.base-rest-responses>4.0.1</version.datawave.base-rest-responses>
+        <version.accumulo>4.0.0-datawave-5</version.accumulo>
+        <version.datawave.accumulo-utils>7.29.0-SNAPSHOT</version.datawave.accumulo-utils>
+        <version.datawave.base-rest-responses>7.29.0-SNAPSHOT</version.datawave.base-rest-responses>
         <version.datawave.type-utils>3.1.2</version.datawave.type-utils>
     </properties>
     <dependencyManagement>

@@ -23,7 +23,7 @@
         <url>https://github.com/NationalSecurityAgency/datawave</url>
     </scm>
     <properties>
-        <version.accumulo>2.1.4-5792fed3-bulkv2</version.accumulo>
+        <version.accumulo>4.0.0-datawave-5</version.accumulo>
         <version.beanutils>1.9.4</version.beanutils>
         <version.datawave.accumulo-utils>4.0.1</version.datawave.accumulo-utils>
         <version.datawave.authorization-api>4.0.1</version.datawave.authorization-api>

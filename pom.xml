@@ -51,7 +51,7 @@
         <sonar.exclusions>**/StandardLexer.java,**/*.js,**/*.css,**/*.html</sonar.exclusions>
         <sonar.sourceEncoding>UTF-8</sonar.sourceEncoding>
         <surefire.forkCount>1C</surefire.forkCount>
-        <version.accumulo>2.1.4-5792fed3-bulkv2</version.accumulo>
+        <version.accumulo>4.0.0-datawave-5</version.accumulo>
         <version.arquillian>1.4.1.Final</version.arquillian>
         <version.arquillian-weld-ee-embedded>1.0.0.Final</version.arquillian-weld-ee-embedded>
         <version.assertj>3.20.2</version.assertj>
@@ -76,7 +76,7 @@
         <version.curator.test>5.7.1</version.curator.test>
         <version.datawave.accumulo-api>4.0.0</version.datawave.accumulo-api>
         <version.datawave.audit-api>4.0.0</version.datawave.audit-api>
-        <version.datawave.authorization-api>4.0.0</version.datawave.authorization-api>
+        <version.datawave.authorization-api>4.0.2-SNAPSHOT</version.datawave.authorization-api>
         <version.datawave.dictionary-api>4.0.5</version.datawave.dictionary-api>
         <version.datawave.mapreduce-query-api>1.0.0</version.datawave.mapreduce-query-api>
         <version.datawave.metrics-reporter>3.0.0</version.datawave.metrics-reporter>
@@ -97,7 +97,7 @@
         <version.hamcrest>1.3</version.hamcrest>
         <version.httpcomponents-httpclient>4.5.13</version.httpcomponents-httpclient>
         <version.httpcomponents-httpcore>4.4.8</version.httpcomponents-httpcore>
-        <version.in-memory-accumulo>4.0.1</version.in-memory-accumulo>
+        <version.in-memory-accumulo>4.0.2</version.in-memory-accumulo>
         <version.infinispan>9.4.21.Final</version.infinispan>
         <version.jackson>2.10.0.pr1</version.jackson>
         <version.jackson-mapper-asl>1.9.13</version.jackson-mapper-asl>
