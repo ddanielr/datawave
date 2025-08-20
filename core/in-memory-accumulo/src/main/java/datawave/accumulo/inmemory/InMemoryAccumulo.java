@@ -113,6 +113,10 @@ public class InMemoryAccumulo {
         t.addMutation(m);
     }
 
+    public String getInstanceID() {
+        return "mock-instance-id";
+    }
+
     public BatchScanner createBatchScanner(String tableName, Authorizations authorizations) {
         return new InMemoryBatchScanner(tables.get(tableName), authorizations);
     }

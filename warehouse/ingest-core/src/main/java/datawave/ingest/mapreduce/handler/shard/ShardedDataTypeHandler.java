@@ -1,7 +1,5 @@
 package datawave.ingest.mapreduce.handler.shard;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -9,7 +7,6 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.accumulo.access.AccessExpression;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.security.ColumnVisibility;
@@ -811,8 +808,7 @@ public abstract class ShardedDataTypeHandler<KEYIN> extends StatsDEnabledDataTyp
      * @return the flattened visibility
      */
     protected byte[] flatten(ColumnVisibility vis) {
-        return markingFunctions == null ? FlattenedVisibilityCache.normalize(AccessExpression.parse(vis.getExpression())).expression.getBytes(UTF_8)
-                        : markingFunctions.flatten(vis);
+        return markingFunctions == null ? FlattenedVisibilityCache.flatten(vis) : markingFunctions.flatten(vis);
     }
 
     /**

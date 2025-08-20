@@ -51,6 +51,7 @@ import org.apache.accumulo.core.data.LoadPlan;
 import org.apache.accumulo.core.data.Range;
 import org.apache.accumulo.core.file.FileOperations;
 import org.apache.accumulo.core.file.FileSKVIterator;
+import org.apache.accumulo.core.metadata.UnreferencedTabletFile;
 import org.apache.accumulo.core.security.Authorizations;
 import org.apache.accumulo.core.spi.crypto.NoCryptoServiceFactory;
 import org.apache.accumulo.minicluster.MiniAccumuloCluster;
@@ -437,7 +438,8 @@ public class BulkIngestMapFileLoaderTest {
      */
     private static void validateRfile(String rfilePath, Configuration conf) throws Exception {
         FileOperations fops = FileOperations.getInstance();
-        try (FileSKVIterator reader = fops.newReaderBuilder().forFile(rfilePath, FileSystem.getLocal(conf), conf, NoCryptoServiceFactory.NONE)
+        UnreferencedTabletFile file = new UnreferencedTabletFile(FileSystem.getLocal(conf), new Path(rfilePath));
+        try (FileSKVIterator reader = fops.newReaderBuilder().forFile(file, FileSystem.getLocal(conf), conf, NoCryptoServiceFactory.NONE)
                         .withTableConfiguration(DefaultConfiguration.getInstance()).build()) {}
     }
 

@@ -2,7 +2,6 @@ package datawave.query.scheduler;
 
 import java.util.*;
 
-import com.google.common.collect.Sets;
 import org.apache.accumulo.core.client.AccumuloClient;
 import org.apache.accumulo.core.client.AccumuloException;
 import org.apache.accumulo.core.client.AccumuloSecurityException;
@@ -20,6 +19,7 @@ import org.apache.log4j.Logger;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import datawave.core.query.configuration.QueryData;
 import datawave.query.config.ShardQueryConfiguration;

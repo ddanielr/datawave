@@ -29,7 +29,6 @@ import org.apache.accumulo.core.iterators.IteratorUtil.IteratorScope;
 import org.apache.accumulo.core.iterators.SortedKeyValueIterator;
 import org.apache.accumulo.core.security.Authorizations;
 import org.apache.accumulo.core.security.ColumnVisibility;
-import org.apache.accumulo.core.spi.common.ServiceEnvironment;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -123,6 +122,11 @@ public class PropogatingIteratorTest {
         @Override
         public TableId getTableId() {
             return null;
+        }
+
+        @Override
+        public boolean isRunningLowOnMemory() {
+            return false;
         }
 
         @Override

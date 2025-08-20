@@ -79,8 +79,8 @@ public class SplittableRFileInputFormat extends RFileInputFormat {
         RFile.Reader rfileReader = RFileUtil.getRFileReader(config, fileSplit.getPath());
 
         // get the first and last keys to bound the blocks while creating splits
-        Key firstKey = rfileReader.getFirstKey();
-        Key lastKey = rfileReader.getLastKey();
+        Key firstKey = new Key(rfileReader.getFirstRow());
+        Key lastKey = new Key(rfileReader.getLastRow());
 
         // use the index blocks to create the splits
         FileSKVIterator iter = rfileReader.getIndex();

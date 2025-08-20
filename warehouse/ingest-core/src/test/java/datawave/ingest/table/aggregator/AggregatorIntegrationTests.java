@@ -69,7 +69,6 @@ public class AggregatorIntegrationTests {
     @BeforeAll
     public static void setup() throws Exception {
         MiniAccumuloConfig config = new MiniAccumuloConfig(temporaryFolder.toFile(), PASSWORD);
-        config.setNumTservers(1);
 
         mac = new MiniAccumuloCluster(config);
         mac.start();

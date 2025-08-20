@@ -28,11 +28,13 @@ import java.util.stream.Collectors;
 import org.apache.accumulo.core.client.AccumuloException;
 import org.apache.accumulo.core.client.AccumuloSecurityException;
 import org.apache.accumulo.core.client.TableNotFoundException;
+import org.apache.accumulo.core.data.ResourceGroupId;
 import org.apache.accumulo.core.data.TableId;
 import org.apache.accumulo.core.data.TabletId;
 import org.apache.accumulo.core.dataImpl.KeyExtent;
 import org.apache.accumulo.core.dataImpl.TabletIdImpl;
 import org.apache.accumulo.core.manager.balancer.TabletServerIdImpl;
+import org.apache.accumulo.core.metadata.schema.Ample;
 import org.apache.accumulo.core.spi.balancer.BalancerEnvironment;
 import org.apache.accumulo.core.spi.balancer.TabletBalancer;
 import org.apache.accumulo.core.spi.balancer.data.TServerStatus;
@@ -184,6 +186,11 @@ public class ShardRendezvousHostBalancerTest {
         public void addAssignment(TabletId tabletId, TabletServerId tabletServerId) {
             assignments.put(tabletId, tabletServerId);
         }
+
+        @Override
+        public Map<ResourceGroupId,Set<TabletServerId>> currentResourceGroups() {
+            return Map.of();
+        }
     }
 
     private static class TestBalanceParams implements TabletBalancer.BalanceParameters {
@@ -214,8 +221,13 @@ public class ShardRendezvousHostBalancerTest {
         }
 
         @Override
-        public String partitionName() {
-            return "Null Partition";
+        public Map<ResourceGroupId,Set<TabletServerId>> currentResourceGroups() {
+            return Map.of();
+        }
+
+        @Override
+        public String currentLevel() {
+            return Ample.DataLevel.USER.name();
         }
 
         @Override
@@ -920,12 +932,12 @@ public class ShardRendezvousHostBalancerTest {
         }
 
         @Override
-        public <T> T instantiate(String className, Class<T> base) throws Exception {
+        public <T> T instantiate(String className, Class<T> base) {
             throw new UnsupportedOperationException();
         }
 
         @Override
-        public <T> T instantiate(TableId tableId, String className, Class<T> base) throws Exception {
+        public <T> T instantiate(TableId tableId, String className, Class<T> base) {
             throw new UnsupportedOperationException();
         }
 

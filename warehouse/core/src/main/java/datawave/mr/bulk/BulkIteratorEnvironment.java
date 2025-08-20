@@ -3,6 +3,7 @@ package datawave.mr.bulk;
 import org.apache.accumulo.core.client.PluginEnvironment;
 import org.apache.accumulo.core.client.SampleNotPresentException;
 import org.apache.accumulo.core.client.sample.SamplerConfiguration;
+import org.apache.accumulo.core.data.TableId;
 import org.apache.accumulo.core.iterators.IteratorEnvironment;
 import org.apache.accumulo.core.iterators.IteratorUtil.IteratorScope;
 import org.apache.accumulo.core.security.Authorizations;
@@ -59,6 +60,11 @@ public class BulkIteratorEnvironment implements IteratorEnvironment {
     @Override
     public TableId getTableId() {
         throw new NotImplementedException();
+    }
+
+    @Override
+    public boolean isRunningLowOnMemory() {
+        return false;
     }
 
 }

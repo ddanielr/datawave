@@ -49,8 +49,10 @@ import org.apache.accumulo.core.client.admin.NewTableConfiguration;
 import org.apache.accumulo.core.client.admin.TabletMergeability;
 import org.apache.accumulo.core.client.admin.TimeType;
 import org.apache.accumulo.core.client.sample.SamplerConfiguration;
+import org.apache.accumulo.core.clientImpl.ClientContext;
 import org.apache.accumulo.core.clientImpl.TableOperationsHelper;
 import org.apache.accumulo.core.clientImpl.TabletMergeabilityUtil;
+import org.apache.accumulo.core.clientImpl.bulk.BulkImport;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Range;
 import org.apache.accumulo.core.data.TabletId;
@@ -388,12 +390,12 @@ class InMemoryTableOperations extends TableOperationsHelper {
     }
 
     @Override
-    public void importTable(String tableName, Set<String> importDirs, ImportConfiguration ic)
-                    throws TableExistsException, AccumuloException, AccumuloSecurityException {
-        throw new UnsupportedOperationException();
+    public ImportDestinationArguments importDirectory(String directory) {
+        return new InMemoryBulkImport(acu, directory);
     }
 
-    public void importTable(String tableName, String importDir, boolean keepMappings, boolean skipOnline)
+    @Override
+    public void importTable(String tableName, Set<String> importDirs, ImportConfiguration ic)
                     throws TableExistsException, AccumuloException, AccumuloSecurityException {
         throw new UnsupportedOperationException();
     }

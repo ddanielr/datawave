@@ -37,9 +37,7 @@ import org.apache.accumulo.core.client.security.tokens.PasswordToken;
 import org.apache.accumulo.core.clientImpl.ClientContext;
 import org.apache.accumulo.core.data.LoadPlan;
 import org.apache.accumulo.core.manager.thrift.ManagerClientService;
-import org.apache.accumulo.core.manager.thrift.ManagerMonitorInfo;
 import org.apache.accumulo.core.rpc.ThriftUtil;
-import org.apache.accumulo.core.rpc.clients.ThriftClientTypes;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configurable;
 import org.apache.hadoop.conf.Configuration;
@@ -1010,7 +1008,7 @@ public final class BulkIngestMapFileLoader implements Runnable {
                         }
                         fileSystem.mkdirs(failuresPath);
                         accumuloClient.tableOperations()
-                           .importDirectory(tableName, tableDir.toString(), failuresDir, false);
+                           .importDirectory(tableDir.toString()).to(tableName).tableTime(false).load();
                         break;
                     case V2:
                         accumuloClient.tableOperations().importDirectory(tableDir.toString())

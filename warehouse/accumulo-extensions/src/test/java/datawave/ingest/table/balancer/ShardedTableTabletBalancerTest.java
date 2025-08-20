@@ -23,6 +23,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.function.Function;
 
+import org.apache.accumulo.core.data.ResourceGroupId;
 import org.apache.accumulo.core.data.TableId;
 import org.apache.accumulo.core.data.TabletId;
 import org.apache.accumulo.core.dataImpl.KeyExtent;
@@ -258,8 +259,8 @@ public class ShardedTableTabletBalancerTest {
                 new TabletIdImpl(new KeyExtent(bar, new Text("2"), new Text("1"))),
                 new TabletIdImpl(new KeyExtent(TNAME, new Text("2"), new Text("1"))));
         //@formatter:on
-        long balanceWaitTime = testBalancer
-                        .balance(new BalanceParamsImpl(testTServers.getCurrent(), testTServers.getGroups(), migrations, migrationsOut, DataLevel.USER));
+        long balanceWaitTime = testBalancer.balance(new BalanceParamsImpl(testTServers.getCurrent(), testTServers.getGroups(), migrations, migrationsOut,
+                        DataLevel.USER, Map.of("foo", foo, "bar", bar, "s", TNAME)));
         assertEquals("Incorrect balance wait time reported", 5000, balanceWaitTime);
         assertTrue("Generated migrations when we had pending migrations for our table! [" + migrationsOut + "]", migrationsOut.isEmpty());
 
@@ -269,8 +270,8 @@ public class ShardedTableTabletBalancerTest {
                 new TabletIdImpl(new KeyExtent(foo, new Text("2"), new Text("1"))),
                 new TabletIdImpl(new KeyExtent(bar, new Text("2"), new Text("1"))));
         //@formatter:on
-        balanceWaitTime = testBalancer
-                        .balance(new BalanceParamsImpl(testTServers.getCurrent(), testTServers.getGroups(), migrations, migrationsOut, DataLevel.USER));
+        balanceWaitTime = testBalancer.balance(new BalanceParamsImpl(testTServers.getCurrent(), testTServers.getGroups(), migrations, migrationsOut,
+                        DataLevel.USER, Map.of("foo", foo, "bar", bar)));
         assertEquals("Incorrect balance wait time reported", 5000, balanceWaitTime);
         ensureUniqueMigrations(migrationsOut);
         testTServers.applyMigrations(migrationsOut);
@@ -550,7 +551,8 @@ public class ShardedTableTabletBalancerTest {
         ArrayList<TabletMigration> migrationsOut = new ArrayList<>();
         for (int i = 1; i <= numPasses; i++) {
             migrationsOut.clear();
-            testBalancer.balance(new BalanceParamsImpl(testTServers.getCurrent(), testTServers.getGroups(), new HashSet<>(), migrationsOut, DataLevel.USER));
+            testBalancer.balance(new BalanceParamsImpl(testTServers.getCurrent(), testTServers.getGroups(), new HashSet<>(), migrationsOut, DataLevel.USER,
+                            Map.of("s", TNAME)));
             ensureUniqueMigrations(migrationsOut);
             testTServers.applyMigrations(migrationsOut);
 
@@ -559,7 +561,8 @@ public class ShardedTableTabletBalancerTest {
         }
         // Then balance one more time to make sure no migrations are returned.
         migrationsOut.clear();
-        testBalancer.balance(new BalanceParamsImpl(testTServers.getCurrent(), testTServers.getGroups(), new HashSet<>(), migrationsOut, DataLevel.USER));
+        testBalancer.balance(new BalanceParamsImpl(testTServers.getCurrent(), testTServers.getGroups(), new HashSet<>(), migrationsOut, DataLevel.USER,
+                        Map.of("s", TNAME)));
         assertEquals("Left with " + migrationsOut.size() + " migrations after " + numPasses + " balance attempts.", 0, migrationsOut.size());
         testTServers.checkBalance(testBalancer.getPartitioner());
     }
@@ -584,7 +587,7 @@ public class ShardedTableTabletBalancerTest {
 
     private static class TestTServers {
         private final Set<TabletServerId> tservers = new HashSet<>();
-        private final Map<String,Set<TabletServerId>> tserverGroups = new HashMap<>();
+        private final Map<ResourceGroupId,Set<TabletServerId>> tserverGroups = new HashMap<>();
         private final SortedMap<TabletId,TabletServerId> tabletLocs = new TreeMap<>();
         private int portNumber = 1000;
         private Random random;
@@ -600,18 +603,18 @@ public class ShardedTableTabletBalancerTest {
         }
 
         public TabletServerId addTServer(String location) {
-            return addTServer(location, portNumber++, "default");
+            return addTServer(location, portNumber++, ResourceGroupId.DEFAULT);
         }
 
-        public TabletServerId addTServer(String location, int port, String group) {
+        public TabletServerId addTServer(String location, int port, ResourceGroupId rgid) {
             TabletServerId tsi = new TabletServerIdImpl(new TServerInstance(location + ":" + port, 6));
             tservers.add(tsi);
-            if (tserverGroups.get(group) != null) {
-                tserverGroups.get(group).add(tsi);
+            if (tserverGroups.get(rgid) != null) {
+                tserverGroups.get(rgid).add(tsi);
             } else {
                 var tserverGroup = new HashSet<TabletServerId>();
                 tserverGroup.add(tsi);
-                tserverGroups.put(group, tserverGroup);
+                tserverGroups.put(rgid, tserverGroup);
             }
             return tsi;
         }
@@ -852,7 +855,7 @@ public class ShardedTableTabletBalancerTest {
             return tabletLocs;
         }
 
-        public Map<String,Set<TabletServerId>> getGroups() {
+        public Map<ResourceGroupId,Set<TabletServerId>> getGroups() {
             return tserverGroups;
         }
     }

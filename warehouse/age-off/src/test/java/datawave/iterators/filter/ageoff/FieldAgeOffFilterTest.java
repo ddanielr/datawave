@@ -1,17 +1,10 @@
 package datawave.iterators.filter.ageoff;
 
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.accumulo.core.client.PluginEnvironment;
-import org.apache.accumulo.core.conf.AccumuloConfiguration;
-import org.apache.accumulo.core.conf.ConfigurationCopy;
-import org.apache.accumulo.core.conf.DefaultConfiguration;
-import org.apache.accumulo.core.conf.Property;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
-import org.apache.accumulo.core.util.ConfigurationImpl;
 import org.junit.Assert;
 import org.junit.Test;
 
