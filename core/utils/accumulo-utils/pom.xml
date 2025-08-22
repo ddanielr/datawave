@@ -64,6 +64,11 @@
         </dependency>
         <dependency>
             <groupId>org.apache.accumulo</groupId>
+            <artifactId>accumulo-access</artifactId>
+            <version>1.0.0-datawave-2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.accumulo</groupId>
             <artifactId>accumulo-core</artifactId>
             <exclusions>
                 <exclusion>

@@ -4,11 +4,9 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.apache.accumulo.core.security.Authorizations;
 import org.apache.accumulo.core.security.ColumnVisibility;
@@ -23,32 +21,29 @@ import com.google.common.base.Charsets;
 import com.google.common.collect.Maps;
 
 /**
- * Accumulo marks all data with a columnVisibility that declares and controls access. MarkingFunctions provide a pattern for mapping a user's preferred means of
- * declaring access controls with the Accumulo columnVisibility pattern. As an example, James Bond might use MarkingFunctions to translate a the
+ * T Accumulo marks all data with a columnVisibility that declares and controls access. MarkingFunctions provide a pattern for mapping a user's preferred means
+ * of declaring access controls with the Accumulo columnVisibility pattern. As an example, James Bond might use MarkingFunctions to translate a the
  * columnVisibility FYEO into the song "For Your Eyes Only" A hospital might use a columnVisibility like 'PPI' but prefer to mark data input and results with a
  * human-readable marking like "Patient Privileged Information"
  */
 
 public interface MarkingFunctions {
 
-    ColumnVisibility combine(Collection<ColumnVisibility> columnVisibilities) throws MarkingFunctions.Exception;
+    ColumnVisibility combine(Collection<ColumnVisibility> columnVisibilities) throws Exception;
 
     @SuppressWarnings("unchecked")
-    Map<String,String> combine(Map<String,String>... markings) throws MarkingFunctions.Exception;
+    Map<String,String> combine(Map<String,String>... markings) throws Exception;
 
-    ColumnVisibility translateToColumnVisibility(Map<String,String> markings) throws MarkingFunctions.Exception;
+    ColumnVisibility translateToColumnVisibility(Map<String,String> markings) throws Exception;
 
-    Map<String,String> translateFromColumnVisibility(ColumnVisibility columnVisibility) throws MarkingFunctions.Exception;
+    Map<String,String> translateFromColumnVisibility(ColumnVisibility columnVisibility) throws Exception;
 
-    Map<String,String> translateFromColumnVisibilityForAuths(ColumnVisibility columnVisibility, Collection<Authorizations> authorizations)
-                    throws MarkingFunctions.Exception;
+    Map<String,String> translateFromColumnVisibilityForAuths(ColumnVisibility columnVisibility, Collection<Authorizations> authorizations) throws Exception;
 
-    Map<String,String> translateFromColumnVisibilityForAuths(ColumnVisibility columnVisibility, Authorizations authorizations)
-                    throws MarkingFunctions.Exception;
+    Map<String,String> translateFromColumnVisibilityForAuths(ColumnVisibility columnVisibility, Authorizations authorizations) throws Exception;
 
     byte[] flatten(ColumnVisibility vis);
 
-    @SuppressWarnings("serial")
     class Exception extends java.lang.Exception {
 
         public Exception() {
@@ -78,25 +73,47 @@ public interface MarkingFunctions {
         @Override
         public ColumnVisibility combine(Collection<ColumnVisibility> expressions) {
 
-            // filter out any empty expressions, then flatten each one (to de-dupe) and concatenate with '&'
-            // flatten the final combined ColumnVisibility and use that to make the ColumnVisibility to return
-            return new ColumnVisibility(new ColumnVisibility(expressions.stream().map(ColumnVisibility::flatten).filter(b -> b.length > 0)
-                            .map(b -> "(" + new String(b, UTF_8) + ")").collect(Collectors.joining("&")).getBytes(UTF_8)).flatten());
+            StringBuilder builder = new StringBuilder();
+            String sep = "";
+            for (ColumnVisibility visibility : expressions) {
+                if (visibility.getExpression().length > 0) {
+                    builder.append(sep);
+                    sep = "&";
+                    builder.append("(");
+                    builder.append(new String(visibility.getExpression(), UTF_8));
+                    builder.append(")");
+                }
+            }
+            return new ColumnVisibility(FlattenedVisibilityCache.flatten(builder.toString()));
         }
 
         @Override
         @SafeVarargs
         public final Map<String,String> combine(Map<String,String>... markings) {
-            // translate COLUMN_VISIBILITY values to ColumnVisibility, combine them and
-            // return translated back to Map
-            return translateFromColumnVisibility(combine(Arrays.stream(markings).filter(m -> m.containsKey(COLUMN_VISIBILITY))
-                            .map(this::translateToColumnVisibility).collect(Collectors.toSet())));
+
+            StringBuilder builder = new StringBuilder();
+            String sep = "";
+            for (Map<String,String> marking : markings) {
+                if (marking.containsKey(COLUMN_VISIBILITY)) {
+                    String expression = marking.get(COLUMN_VISIBILITY);
+                    if (expression != null && !expression.isBlank()) {
+                        builder.append(sep);
+                        sep = "&";
+                        builder.append("(");
+                        builder.append(expression);
+                        builder.append(")");
+                    }
+                }
+            }
+            var combinedViz = new ColumnVisibility(FlattenedVisibilityCache.flatten(builder.toString()));
+            Map<String,String> combinedMarkings = Maps.newHashMap();
+            combinedMarkings.put(COLUMN_VISIBILITY, new String(combinedViz.getExpression(), UTF_8));
+            return combinedMarkings;
         }
 
         @Override
         public ColumnVisibility translateToColumnVisibility(Map<String,String> markings) {
-            ColumnVisibility cv = new ColumnVisibility(markings.get(COLUMN_VISIBILITY));
-            return new ColumnVisibility(cv.flatten());
+            return new ColumnVisibility(FlattenedVisibilityCache.flatten(markings.get(COLUMN_VISIBILITY)));
         }
 
         @Override
