@@ -6,6 +6,7 @@ import static datawave.ingest.mapreduce.job.BulkIngestMapFileLoader.FAILED_FILE_
 import static datawave.ingest.mapreduce.job.BulkIngestMapFileLoader.INPUT_FILES_MARKER;
 import static datawave.ingest.mapreduce.job.BulkIngestMapFileLoader.LOADING_FILE_MARKER;
 import static datawave.ingest.mapreduce.job.BulkIngestMapFileLoader.LOADPLAN_FILE_GLOB;
+import static org.apache.accumulo.core.conf.Property.TABLE_BULK_MAX_TABLETS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
@@ -23,8 +24,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.DirectoryStream;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -162,6 +161,9 @@ public class BulkIngestMapFileLoaderTest {
             if (!client.tableOperations().exists(SHARD_TABLE)) {
                 client.tableOperations().create(SHARD_TABLE);
             }
+            client.tableOperations().setProperty(METADATA_TABLE, TABLE_BULK_MAX_TABLETS.getKey(), "111");
+            client.tableOperations().setProperty(SHARD_TABLE, TABLE_BULK_MAX_TABLETS.getKey(), "111");
+
             client.securityOperations().changeUserAuthorizations(USER, USER_AUTHS);
         }
     }
@@ -395,31 +397,8 @@ public class BulkIngestMapFileLoaderTest {
 
             Assert.assertTrue("Unexpected log output", log.contains("Bringing Map Files online for " + METADATA_TABLE));
 
-            switch (bulkMode) {
-                case V1:
-                    // Verify failures dir has corrupted rfile, which was renamed by Accumulo
-                    var failDir = Paths.get(workPath.toString(), jobName, "mapFiles", "failures", METADATA_TABLE);
-                    Assert.assertTrue(Files.exists(failDir));
-
-                    boolean found = false;
-                    var failMatcher = FileSystems.getDefault().getPathMatcher("glob:I*.rf");
-                    try (DirectoryStream<java.nio.file.Path> dirStream = Files.newDirectoryStream(failDir)) {
-                        for (java.nio.file.Path p : dirStream) {
-                            Assert.assertTrue(failMatcher.matches(p.getFileName()));
-                            logger.info("Found " + p.getFileName() + " in " + failDir);
-                            found = true;
-                        }
-                    }
-                    Assert.assertTrue("We found " + failDir + "as expected, but rfile was missing", found);
-                    break;
-                case V2:
-                    // Verify that metadata rfile remains in place
-                    Assert.assertTrue("metadata rfile should've remained in place after failure", Files.exists(metaRfilePath));
-                    break;
-                default:
-                    throw new RuntimeException("Unsupported import mode " + bulkMode);
-            }
-
+            // Verify that metadata rfile remains in place
+            Assert.assertTrue("metadata rfile should've remained in place after failure", Files.exists(metaRfilePath));
             Assert.assertTrue(shardRfilePath + " should've been imported but it got left behind", !Files.exists(shardRfilePath));
 
             verifyImportedData(SHARD_TABLE);
@@ -463,8 +442,8 @@ public class BulkIngestMapFileLoaderTest {
     }
 
     @AfterClass
-    public static void teardownClass() throws IOException {
-        cluster.close();
+    public static void teardownClass() throws IOException, InterruptedException {
+        cluster.stop();
     }
 
     @Test
@@ -938,16 +917,6 @@ public class BulkIngestMapFileLoaderTest {
     }
 
     /**
-     * Verify that loader in bulk V1 mode behaves as expected in the typical use case, utilizing MiniAccumuloCluster
-     */
-    @Test
-    public void testLoaderV1SucceedsWithMAC() throws Exception {
-        BulkIngestMapFileLoaderTest.logger.info("testLoaderV1SucceedsWithMAC called...");
-        runLoaderHappyTest("job_shouldSucceed_V1", ImportMode.V1);
-        BulkIngestMapFileLoaderTest.logger.info("testLoaderV1SucceedsWithMAC completed.");
-    }
-
-    /**
      * Verify that loader in bulk V2 mode behaves as expected in the typical use case, utilizing MiniAccumuloCluster
      */
     @Test
@@ -955,16 +924,6 @@ public class BulkIngestMapFileLoaderTest {
         BulkIngestMapFileLoaderTest.logger.info("testLoaderV2SucceedsWithMAC called...");
         runLoaderHappyTest("job_shouldSucceed_V2", ImportMode.V2);
         BulkIngestMapFileLoaderTest.logger.info("testLoaderV2SucceedsWithMAC completed.");
-    }
-
-    /**
-     * Verify that loader in bulk V1 mode behaves as expected when an importDirectory failure occurs, utilizing MiniAccumuloCluster
-     */
-    @Test
-    public void testLoaderV1FailsWithMAC() throws Exception {
-        BulkIngestMapFileLoaderTest.logger.info("testLoaderV1FailsWithMAC called...");
-        runLoaderSadTest("job_shouldFail_V1", ImportMode.V1);
-        BulkIngestMapFileLoaderTest.logger.info("testLoaderV1FailsWithMAC completed.");
     }
 
     /**
