@@ -1,24 +1,15 @@
 package datawave.iterators.filter.ageoff;
 
-import java.io.IOException;
 import java.util.Map;
 
 import org.apache.accumulo.core.client.PluginEnvironment;
 import org.apache.accumulo.core.client.SampleNotPresentException;
 import org.apache.accumulo.core.client.TableNotFoundException;
 import org.apache.accumulo.core.client.sample.SamplerConfiguration;
-import org.apache.accumulo.core.conf.AccumuloConfiguration;
-import org.apache.accumulo.core.conf.ConfigurationCopy;
-import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.TableId;
-import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.iterators.IteratorEnvironment;
 import org.apache.accumulo.core.iterators.IteratorUtil;
-import org.apache.accumulo.core.iterators.SortedKeyValueIterator;
 import org.apache.accumulo.core.security.Authorizations;
-import org.apache.accumulo.core.spi.common.ServiceEnvironment;
-import org.apache.accumulo.core.util.ConfigurationImpl;
-import org.apache.commons.lang.NotImplementedException;
 
 public class ConfigurableIteratorEnvironment implements IteratorEnvironment {
 
@@ -48,12 +39,6 @@ public class ConfigurableIteratorEnvironment implements IteratorEnvironment {
     @Override
     public IteratorUtil.IteratorScope getIteratorScope() {
         return scope;
-    }
-
-    @Override
-    @Deprecated
-    public ServiceEnvironment getServiceEnv() {
-        return null;
     }
 
     @Override
@@ -89,6 +74,11 @@ public class ConfigurableIteratorEnvironment implements IteratorEnvironment {
     @Override
     public TableId getTableId() {
         return FAKE_ID;
+    }
+
+    @Override
+    public boolean isRunningLowOnMemory() {
+        return false;
     }
 
     @Override
