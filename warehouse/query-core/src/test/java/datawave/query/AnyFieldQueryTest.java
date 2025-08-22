@@ -32,7 +32,6 @@ import org.apache.accumulo.core.client.Scanner;
 import org.apache.accumulo.core.client.TableNotFoundException;
 import org.apache.accumulo.core.client.admin.InstanceOperations;
 import org.apache.accumulo.core.client.admin.NamespaceOperations;
-import org.apache.accumulo.core.client.admin.ReplicationOperations;
 import org.apache.accumulo.core.client.admin.SecurityOperations;
 import org.apache.accumulo.core.client.admin.TableOperations;
 import org.apache.accumulo.core.client.sample.SamplerConfiguration;
@@ -1581,11 +1580,6 @@ public class AnyFieldQueryTest extends AbstractFunctionalQuery {
         @Override
         public InstanceOperations instanceOperations() {
             return client.instanceOperations();
-        }
-
-        @Override
-        public ReplicationOperations replicationOperations() {
-            return client.replicationOperations();
         }
 
         @Override

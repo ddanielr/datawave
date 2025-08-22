@@ -1,17 +1,12 @@
 package datawave.query.scheduler;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
-import org.apache.accumulo.core.client.AccumuloClient;
-import org.apache.accumulo.core.client.AccumuloException;
-import org.apache.accumulo.core.client.AccumuloSecurityException;
-import org.apache.accumulo.core.client.InvalidTabletHostingRequestException;
 import org.apache.accumulo.core.client.IteratorSetting;
-import org.apache.accumulo.core.client.TableDeletedException;
-import org.apache.accumulo.core.client.TableNotFoundException;
-import org.apache.accumulo.core.client.TableOfflineException;
-import org.apache.accumulo.core.clientImpl.ClientContext;
-import org.apache.accumulo.core.clientImpl.ClientTabletCache;
 import org.apache.accumulo.core.data.Range;
 import org.apache.accumulo.core.data.TableId;
 import org.apache.hadoop.io.Text;
@@ -19,7 +14,6 @@ import org.apache.log4j.Logger;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 import datawave.core.query.configuration.QueryData;
 import datawave.query.config.ShardQueryConfiguration;
@@ -44,11 +38,6 @@ public class PushdownFunction implements Function<QueryData,List<ScannerChunk>> 
     private final ShardQueryConfiguration config;
 
     /**
-     * Tablet locator
-     */
-    private final ClientTabletCache tabletLocator;
-
-    /**
      * Set of query plans
      */
     protected Set<Integer> queryPlanSet;
@@ -58,8 +47,7 @@ public class PushdownFunction implements Function<QueryData,List<ScannerChunk>> 
     protected TableId tableId;
 
     @Deprecated
-    public PushdownFunction(ClientTabletCache tabletLocator, ShardQueryConfiguration config, Collection<IteratorSetting> settings, TableId tableId) {
-        this.tabletLocator = tabletLocator;
+    public PushdownFunction(ShardQueryConfiguration config, Collection<IteratorSetting> settings, TableId tableId) {
         this.config = config;
         this.customSettings = settings;
         this.tableId = tableId;

@@ -15,7 +15,6 @@ import org.apache.accumulo.core.client.BatchScanner;
 import org.apache.accumulo.core.client.IteratorSetting;
 import org.apache.accumulo.core.client.TableNotFoundException;
 import org.apache.accumulo.core.clientImpl.ClientContext;
-import org.apache.accumulo.core.clientImpl.ClientTabletCache;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.TableId;
 import org.apache.accumulo.core.data.Value;
@@ -192,6 +191,7 @@ public class PushdownScheduler extends Scheduler {
         return session;
     }
 
+    @SuppressWarnings("deprecation")
     protected PushdownFunction getPushdownFunction() {
         return new PushdownFunction(config, settings, tableId);
     }

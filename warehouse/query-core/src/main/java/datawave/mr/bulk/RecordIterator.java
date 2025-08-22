@@ -25,7 +25,6 @@ import org.apache.accumulo.core.client.SampleNotPresentException;
 import org.apache.accumulo.core.client.TableNotFoundException;
 import org.apache.accumulo.core.client.sample.SamplerConfiguration;
 import org.apache.accumulo.core.conf.AccumuloConfiguration;
-import org.apache.accumulo.core.conf.DefaultConfiguration;
 import org.apache.accumulo.core.conf.Property;
 import org.apache.accumulo.core.conf.SiteConfiguration;
 import org.apache.accumulo.core.crypto.CryptoFactoryLoader;
@@ -50,7 +49,6 @@ import org.apache.accumulo.core.iteratorsImpl.system.MultiIterator;
 import org.apache.accumulo.core.iteratorsImpl.system.VisibilityFilter;
 import org.apache.accumulo.core.security.Authorizations;
 import org.apache.accumulo.core.security.ColumnVisibility;
-import org.apache.accumulo.core.spi.common.ServiceEnvironment;
 import org.apache.accumulo.core.spi.crypto.CryptoEnvironment;
 import org.apache.accumulo.core.spi.crypto.CryptoService;
 import org.apache.hadoop.conf.Configuration;
@@ -288,7 +286,7 @@ public class RecordIterator extends RangeSplit implements SortedKeyValueIterator
         return splits;
     }
 
-    protected synchronized void initialize(Configuration conf, boolean initRanges) throws IOException {
+    protected synchronized void initialize(Configuration conf, boolean initRanges) throws IOException, ReflectiveOperationException {
 
         if (isOpen) {
             close();
@@ -385,7 +383,8 @@ public class RecordIterator extends RangeSplit implements SortedKeyValueIterator
      * @throws IOException
      *             for issues with read/write
      */
-    protected SortedKeyValueIterator<Key,Value> applyTableIterators(SortedKeyValueIterator<Key,Value> topIter, Configuration conf) throws IOException {
+    protected SortedKeyValueIterator<Key,Value> applyTableIterators(SortedKeyValueIterator<Key,Value> topIter, Configuration conf)
+                    throws IOException, ReflectiveOperationException {
 
         if (null != acuTableConf) {
             // don't need to be populated as we'll do this later.

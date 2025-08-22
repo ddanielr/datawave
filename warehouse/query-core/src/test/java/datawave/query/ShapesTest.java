@@ -54,8 +54,6 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 
-import datawave.accumulo.inmemory.InMemoryAccumulo;
-import datawave.accumulo.inmemory.InMemoryAccumuloClient;
 import datawave.configuration.spring.SpringBean;
 import datawave.core.query.configuration.GenericQueryConfiguration;
 import datawave.data.type.LcNoDiacriticsType;
@@ -140,7 +138,6 @@ public abstract class ShapesTest {
         @BeforeClass
         public static void setUp() throws Exception {
             MiniAccumuloConfig cfg = new MiniAccumuloConfig(temporaryFolder.newFolder(), PASSWORD);
-            cfg.setNumTservers(1);
             mac = new MiniAccumuloCluster(cfg);
             mac.start();
 
@@ -173,8 +170,6 @@ public abstract class ShapesTest {
         @BeforeClass
         public static void setUp() throws Exception {
             MiniAccumuloConfig cfg = new MiniAccumuloConfig(temporaryFolder.newFolder(), PASSWORD);
-            cfg.setNumTservers(1);
-
             mac = new MiniAccumuloCluster(cfg);
             mac.start();
 
