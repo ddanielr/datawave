@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 
-import datawave.accumulo.inmemory.InMemoryInstance;
+import datawave.accumulo.inmemory.InMemoryAccumulo;
 import datawave.core.query.configuration.GenericQueryConfiguration;
 import datawave.microservice.query.QueryImpl;
 import datawave.query.attributes.Document;
@@ -40,7 +40,7 @@ import datawave.test.HitTermAssertions;
 /**
  * Class that holds common methods useful for integration testing queries.
  * <p>
- * This test framework is compatible with either an {@link InMemoryInstance} or {@link MiniAccumuloCluster}. It only requires an {@link AccumuloClient}.
+ * This test framework is compatible with either an {@link InMemoryAccumulo} or {@link MiniAccumuloCluster}. It only requires an {@link AccumuloClient}.
  * <p>
  * Features include
  * <ul>

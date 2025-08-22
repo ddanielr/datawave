@@ -17,8 +17,8 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import datawave.accumulo.inmemory.InMemoryAccumulo;
 import datawave.accumulo.inmemory.InMemoryAccumuloClient;
-import datawave.accumulo.inmemory.InMemoryInstance;
 import datawave.configuration.spring.SpringBean;
 import datawave.helpers.PrintUtility;
 import datawave.ingest.data.TypeRegistry;
@@ -54,8 +54,8 @@ public abstract class MultiNormalizerTest extends AbstractQueryTest {
 
         @BeforeClass
         public static void setUp() throws Exception {
-            InMemoryInstance i = new InMemoryInstance(ShardRangeTest.class.getName());
-            client = new InMemoryAccumuloClient("", i);
+            InMemoryAccumulo acc = new InMemoryAccumulo(ShardRangeTest.class.getName());
+            client = new InMemoryAccumuloClient("", acc);
 
             MultiNormalizerIngest ingest = new MultiNormalizerIngest(client);
             ingest.write(RangeType.SHARD);
@@ -80,8 +80,8 @@ public abstract class MultiNormalizerTest extends AbstractQueryTest {
 
         @BeforeClass
         public static void setUp() throws Exception {
-            InMemoryInstance i = new InMemoryInstance(DocumentRangeTest.class.getName());
-            client = new InMemoryAccumuloClient("", i);
+            InMemoryAccumulo acc = new InMemoryAccumulo(DocumentRangeTest.class.getName());
+            client = new InMemoryAccumuloClient("", acc);
 
             MultiNormalizerIngest ingest = new MultiNormalizerIngest(client);
             ingest.write(RangeType.DOCUMENT);
