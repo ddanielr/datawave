@@ -81,7 +81,7 @@ public class TermInfoAggregation implements Function<Collection<TermInfo>,Discov
                     // Keep track of counts for individual vis
                     if (separateCountsByColumnVisibility) {
                         Long cnt = 0L;
-                        String vis = FlattenedVisibilityCache.normalize(AccessExpression.parse(ti.vis.getExpression())).expression;
+                        String vis = new String(FlattenedVisibilityCache.flatten(AccessExpression.of(ti.vis.getExpression())));
                         if (counts.containsKey(vis)) {
                             cnt = counts.get(vis);
                             cnt += chosenCount;

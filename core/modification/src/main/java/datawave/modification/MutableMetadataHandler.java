@@ -16,7 +16,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
 
-import org.apache.accumulo.access.AccessExpression;
 import org.apache.accumulo.core.client.AccumuloClient;
 import org.apache.accumulo.core.client.AccumuloException;
 import org.apache.accumulo.core.client.AccumuloSecurityException;
@@ -846,8 +845,8 @@ public class MutableMetadataHandler extends ModificationServiceConfiguration {
 
                 if (oldColumnVisibility != null) {
                     // need to compare the flattened values for equivalence.
-                    String oldColViz = FlattenedVisibilityCache.normalize(AccessExpression.parse(oldColumnVisibility.getExpression())).expression;
-                    String thisVis = FlattenedVisibilityCache.normalize(AccessExpression.parse(thisViz.getExpression())).expression;
+                    String oldColViz = new String(FlattenedVisibilityCache.flatten(oldColumnVisibility));
+                    String thisVis = new String(FlattenedVisibilityCache.flatten(thisViz));
                     if (!oldColViz.equals(thisVis)) {
                         log.trace("Skipping key that does not match with column visibility: {}", e.getKey());
                         continue;

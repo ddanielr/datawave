@@ -2,7 +2,6 @@ package datawave.query.parser;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -81,7 +80,7 @@ public class EventFields implements SetMultimap<String,FieldValue>, KryoSerializ
         public int size() {
             byte[] exp = visibility.getExpression();
             return (exp == null || exp.length == 0 ? 0
-                            : FlattenedVisibilityCache.normalize(AccessExpression.parse(exp)).expression.length() + value.length
+                            : FlattenedVisibilityCache.flatten(AccessExpression.of(exp)).length + value.length
                                             + (context == null ? 0 : context.length() + (hit == null ? 0 : 1)));
         }
 
@@ -91,7 +90,7 @@ public class EventFields implements SetMultimap<String,FieldValue>, KryoSerializ
             if (null != visibility) {
                 byte[] expr = visibility.getExpression();
                 buf.append(" visibility: ").append(new String(expr == null || expr.length == 0 ? new byte[0]
-                                : FlattenedVisibilityCache.normalize(AccessExpression.parse(expr)).expression.getBytes(UTF_8)));
+                                : new String(FlattenedVisibilityCache.flatten(AccessExpression.of(expr))).getBytes(UTF_8)));
             }
             if (null != value)
                 buf.append(" value size: ").append(value.length);
